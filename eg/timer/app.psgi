@@ -30,13 +30,13 @@ builder {
             my $h = $env->{'hippie.handle'};
 
             if ($env->{PATH_INFO} eq '/init') {
-                my $w; $w = AnyEvent->timer( interval => $interval,
+                $env->{'_app.timer'} = AnyEvent->timer( interval => $interval,
                                              cb => sub {
                                                  $h->send_msg({
                                                      type => 'timer',
                                                      time => AnyEvent->now,
                                                  });
-                                                 $w;
+                                                 $env->{'_app.timer'};
                                              });
             }
             elsif ($env->{PATH_INFO} eq '/message') {
@@ -48,9 +48,11 @@ builder {
                     unless $h;
 
                 if ($env->{PATH_INFO} eq '/error') {
+                    delete $env->{'_app.timer'};
                     warn "==> disconnecting $h";
                 }
                 else {
+                    delete $env->{'_app.timer'};
                     die "unknown hippie message";
                 }
             }
